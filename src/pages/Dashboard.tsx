@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, Users, Folder, Settings, Plus } from "lucide-react";
+import { Home, Users, Folder, Settings, Plus, LayoutGrid, List, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import FeedCard from "@/components/FeedCard";
 import AddCategoryModal from "@/components/AddCategoryModal";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const navigationItems = [
   { icon: Home, label: "Home", active: true },
@@ -13,36 +20,71 @@ const navigationItems = [
   { icon: Settings, label: "Settings", active: false },
 ];
 
-const mockPosts = [
+const mockCategories = [
   {
-    id: 1,
-    avatar: "TN",
-    handle: "@technewsth",
-    name: "Tech News Thailand",
-    summary: "เทคโนโลยี AI กำลังเปลี่ยนแปลงวงการธุรกิจไทย ด้วยการนำมาใช้ในการวิเคราะห์ข้อมูลและปรับปรุงประสบการณ์ลูกค้า",
-    hashtags: ["#AI", "#TechThailand", "#Innovation"],
+    id: "all",
+    name: "หมวดรวม",
+    posts: [
+      {
+        id: 1,
+        avatar: "TN",
+        handle: "@technewsth",
+        name: "Tech News Thailand",
+        summary: "เทคโนโลยี AI กำลังเปลี่ยนแปลงวงการธุรกิจไทย ด้วยการนำมาใช้ในการวิเคราะห์ข้อมูลและปรับปรุงประสบการณ์ลูกค้า",
+        hashtags: ["#AI", "#TechThailand", "#Innovation"],
+      },
+      {
+        id: 2,
+        avatar: "DT",
+        handle: "@digitaltoday",
+        name: "Digital Today",
+        summary: "5 เทรนด์ Digital Marketing ปี 2024 ที่นักการตลาดต้องรู้ เน้นการใช้ AI และ Personalization",
+        hashtags: ["#DigitalMarketing", "#Trends2024"],
+      },
+      {
+        id: 3,
+        avatar: "ST",
+        handle: "@startupth",
+        name: "Startup Thailand",
+        summary: "Startup ไทยได้รับการลงทุนรวมกว่า 2,000 ล้านบาทในไตรมาสแรก โดยเน้นไปที่ธุรกิจ Fintech และ E-commerce",
+        hashtags: ["#StartupTH", "#Investment", "#Fintech"],
+      },
+    ],
   },
   {
-    id: 2,
-    avatar: "DT",
-    handle: "@digitaltoday",
-    name: "Digital Today",
-    summary: "5 เทรนด์ Digital Marketing ปี 2024 ที่นักการตลาดต้องรู้ เน้นการใช้ AI และ Personalization",
-    hashtags: ["#DigitalMarketing", "#Trends2024"],
+    id: "tech",
+    name: "เทคโนโลยี",
+    posts: [
+      {
+        id: 1,
+        avatar: "TN",
+        handle: "@technewsth",
+        name: "Tech News Thailand",
+        summary: "เทคโนโลยี AI กำลังเปลี่ยนแปลงวงการธุรกิจไทย ด้วยการนำมาใช้ในการวิเคราะห์ข้อมูลและปรับปรุงประสบการณ์ลูกค้า",
+        hashtags: ["#AI", "#TechThailand", "#Innovation"],
+      },
+    ],
   },
   {
-    id: 3,
-    avatar: "ST",
-    handle: "@startupth",
-    name: "Startup Thailand",
-    summary: "Startup ไทยได้รับการลงทุนรวมกว่า 2,000 ล้านบาทในไตรมาสแรก โดยเน้นไปที่ธุรกิจ Fintech และ E-commerce",
-    hashtags: ["#StartupTH", "#Investment", "#Fintech"],
+    id: "marketing",
+    name: "การตลาด",
+    posts: [
+      {
+        id: 2,
+        avatar: "DT",
+        handle: "@digitaltoday",
+        name: "Digital Today",
+        summary: "5 เทรนด์ Digital Marketing ปี 2024 ที่นักการตลาดต้องรู้ เน้นการใช้ AI และ Personalization",
+        hashtags: ["#DigitalMarketing", "#Trends2024"],
+      },
+    ],
   },
 ];
 
 const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState("วันนี้");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [layout, setLayout] = useState<"compact" | "normal" | "large">("normal");
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -78,13 +120,54 @@ const Dashboard = () => {
         <main className="p-8 space-y-6">
           <div className="flex items-center justify-between animate-fade-in">
             <h2 className="text-3xl font-bold">แดชบอร์ดของคุณ</h2>
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground hover-glow"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              เพิ่มหมวดใหม่
-            </Button>
+            <div className="flex items-center gap-3">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="border-border hover:bg-primary/10"
+                  >
+                    <LayoutGrid className="h-4 w-4 mr-2" />
+                    เลือกเลย์เอาต์
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 bg-card border-border">
+                  <RadioGroup value={layout} onValueChange={(value) => setLayout(value as any)}>
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold">ขนาดการ์ด</Label>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="compact" id="compact" />
+                        <Label htmlFor="compact" className="flex items-center gap-2 cursor-pointer">
+                          <List className="h-4 w-4" />
+                          กะทัดรัด
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="normal" id="normal" />
+                        <Label htmlFor="normal" className="flex items-center gap-2 cursor-pointer">
+                          <LayoutGrid className="h-4 w-4" />
+                          ปกติ
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="large" id="large" />
+                        <Label htmlFor="large" className="flex items-center gap-2 cursor-pointer">
+                          <Square className="h-4 w-4" />
+                          ใหญ่
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </PopoverContent>
+              </Popover>
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground hover-glow"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                เพิ่มหมวดใหม่
+              </Button>
+            </div>
           </div>
 
           {/* Filter Chips */}
@@ -106,15 +189,26 @@ const Dashboard = () => {
             ))}
           </div>
 
-          {/* Feed Cards */}
-          <div className="space-y-4">
-            {mockPosts.map((post, index) => (
+          {/* Feed Cards by Category */}
+          <div className="space-y-8">
+            {mockCategories.map((category, categoryIndex) => (
               <div
-                key={post.id}
-                className="animate-cascade"
-                style={{ animationDelay: `${0.1 * (index + 2)}s` }}
+                key={category.id}
+                className="space-y-4 animate-fade-in"
+                style={{ animationDelay: `${0.1 * categoryIndex}s` }}
               >
-                <FeedCard {...post} />
+                <h3 className="text-xl font-semibold text-foreground">{category.name}</h3>
+                <div className="space-y-4">
+                  {category.posts.map((post, postIndex) => (
+                    <div
+                      key={post.id}
+                      className="animate-cascade"
+                      style={{ animationDelay: `${0.1 * (postIndex + 1)}s` }}
+                    >
+                      <FeedCard {...post} layout={layout} />
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
