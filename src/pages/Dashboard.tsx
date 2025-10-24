@@ -98,7 +98,7 @@ const Dashboard = () => {
               key={item.label}
               className={cn(
                 "p-3 rounded-lg hover-glow transition-colors",
-                item.active ? "bg-primary text-primary-foreground" : "text-secondary hover:text-foreground"
+                item.active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               <item.icon className="h-6 w-6" />
@@ -110,8 +110,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-1">
         {/* Top Bar */}
-        <header className="h-16 bg-muted border-b border-border flex items-center justify-between px-8">
-          <h1 className="text-2xl font-bold">Xocial</h1>
+        <header className="h-16 bg-muted border-b border-border flex items-center justify-end px-8">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
             U
           </div>
