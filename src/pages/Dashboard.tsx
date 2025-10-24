@@ -85,12 +85,13 @@ const Dashboard = () => {
   const [activeFilter, setActiveFilter] = useState("วันนี้");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [layout, setLayout] = useState<"compact" | "normal" | "large">("normal");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(["all", "tech", "marketing"]);
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className="w-20 bg-muted border-r border-border flex flex-col items-center py-8 space-y-8">
-        <div className="text-2xl font-bold text-primary">X</div>
+        <div className="text-xl font-bold text-primary tracking-tight">Xocial</div>
         <nav className="flex-1 flex flex-col space-y-4">
           {navigationItems.map((item) => (
             <button
@@ -170,8 +171,40 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Filter Chips */}
-          <div className="flex gap-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          {/* Category Filter */}
+          <div className="space-y-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="flex items-center justify-center gap-3">
+              {mockCategories.map((category) => {
+                const isSelected = selectedCategories.includes(category.id);
+                const toggleCategory = () => {
+                  setSelectedCategories(prev => 
+                    prev.includes(category.id)
+                      ? prev.filter(id => id !== category.id)
+                      : [...prev, category.id]
+                  );
+                };
+                
+                return (
+                  <Badge
+                    key={category.id}
+                    variant={isSelected ? "default" : "outline"}
+                    className={cn(
+                      "px-4 py-2 cursor-pointer hover-glow transition-all",
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : "border-border hover:bg-primary/10"
+                    )}
+                    onClick={toggleCategory}
+                  >
+                    {category.name}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Time Filter Chips */}
+          <div className="flex gap-3 animate-fade-in" style={{ animationDelay: "0.15s" }}>
             {["วันนี้", "7 วัน", "30 วัน"].map((filter) => (
               <Badge
                 key={filter}
@@ -191,26 +224,28 @@ const Dashboard = () => {
 
           {/* Feed Cards by Category */}
           <div className="space-y-8">
-            {mockCategories.map((category, categoryIndex) => (
-              <div
-                key={category.id}
-                className="space-y-4 animate-fade-in"
-                style={{ animationDelay: `${0.1 * categoryIndex}s` }}
-              >
-                <h3 className="text-xl font-semibold text-foreground">{category.name}</h3>
-                <div className="space-y-4">
-                  {category.posts.map((post, postIndex) => (
-                    <div
-                      key={post.id}
-                      className="animate-cascade"
-                      style={{ animationDelay: `${0.1 * (postIndex + 1)}s` }}
-                    >
-                      <FeedCard {...post} layout={layout} />
-                    </div>
-                  ))}
+            {mockCategories
+              .filter(category => selectedCategories.includes(category.id))
+              .map((category, categoryIndex) => (
+                <div
+                  key={category.id}
+                  className="space-y-4 animate-fade-in"
+                  style={{ animationDelay: `${0.1 * categoryIndex}s` }}
+                >
+                  <h3 className="text-xl font-semibold text-foreground">{category.name}</h3>
+                  <div className="space-y-4">
+                    {category.posts.map((post, postIndex) => (
+                      <div
+                        key={post.id}
+                        className="animate-cascade"
+                        style={{ animationDelay: `${0.1 * (postIndex + 1)}s` }}
+                      >
+                        <FeedCard {...post} layout={layout} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </main>
       </div>
